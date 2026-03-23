@@ -26,7 +26,7 @@ const AppLayout: React.FC = () => (
 		<Layout.Header
 			projectId="Scaffold"
 			projectTitle="Scaffold"
-			hasThemeSwitch={true}
+			disableSetThemeOnLoad
 			contentCenter={
 				<>
 					<NavLink to="/debug">
