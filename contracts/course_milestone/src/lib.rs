@@ -404,7 +404,7 @@ impl CourseMilestone {
             .persistent()
             .get(&key)
             .unwrap_or_else(|| Vec::new(&env));
-        if courses.len() > 0 {
+        if !courses.is_empty() {
             Self::extend_persistent(&env, &key);
         }
         courses
