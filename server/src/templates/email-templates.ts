@@ -154,7 +154,7 @@ export const templates: Record<string, (vars: EmailVariables) => string> = {
 		baseLayout(
 			`
     <p>Hi ${vars.name},</p>
-    <p><strong>🎉 Your milestone has been approved!</strong></p>
+    <p><strong>Yayy! Your milestone has been approved!</strong></p>
     <p>Your milestone <strong>${vars.milestoneTitle}</strong> for the course <strong>${vars.courseTitle}</strong> has been approved by the admin.</p>
     
     <ul>
@@ -175,7 +175,7 @@ export const templates: Record<string, (vars: EmailVariables) => string> = {
 		baseLayout(
 			`
     <p>Hi ${vars.name},</p>
-    <p><strong>❌ Your milestone was not approved</strong></p>
+    <p><strong>Your milestone was not approved</strong></p>
     <p>Your submission for <strong>${vars.milestoneTitle}</strong> in the course <strong>${vars.courseTitle}</strong> was reviewed by the admin and requires changes.</p>
 
     <ul>

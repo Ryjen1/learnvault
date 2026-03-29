@@ -2,11 +2,13 @@ import { type Request, type Response } from "express"
 import { milestoneStore } from "../db/milestone-store"
 import { type AdminRequest } from "../middleware/admin.middleware"
 import { credentialService } from "../services/credential.service"
-import { sendEmail, createEmailService } from "../services/email.service"
+import { createEmailService } from "../services/email.service"
 import { stellarContractService } from "../services/stellar-contract.service"
 import { templates, toPlainText } from "../templates/email-templates"
 
-const emailService = createEmailService(process.env.EMAIL_API_KEY || "")
+const emailService = createEmailService(
+	process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY || "",
+)
 
 function hasStellarMilestoneCredentials(): boolean {
 	return Boolean(
@@ -101,11 +103,14 @@ export async function approveMilestone(
 			if (report.scholar_email) {
 				await emailService.sendNotification({
 					to: report.scholar_email,
-					subject: "Milestone Approved 🎉",
+					subject: "Milestone Approved ",
 					template: "milestone-approved-admin",
 					data: {
 						name: report.scholar_name || "Scholar",
 						courseTitle: report.course_title || `Course ${report.course_id}`,
+						milestoneTitle:
+							report.milestone_title ||
+							`Milestone ${report.milestone_number ?? report.milestone_id}`,
 						milestoneNumber: String(
 							report.milestone_number ?? report.milestone_id,
 						),
@@ -211,6 +216,9 @@ export async function rejectMilestone(
 					data: {
 						name: report.scholar_name || "Scholar",
 						courseTitle: report.course_title || `Course ${report.course_id}`,
+						milestoneTitle:
+							report.milestone_title ||
+							`Milestone ${report.milestone_number ?? report.milestone_id}`,
 						milestoneNumber: String(
 							report.milestone_number ?? report.milestone_id,
 						),
@@ -218,33 +226,6 @@ export async function rejectMilestone(
 						milestoneUrl: `${process.env.FRONTEND_URL || ""}/milestones`,
 						unsubscribeUrl: "#",
 					},
-				})
-			}
-		} catch (emailErr) {
-			console.error("[admin] rejection email failed (non-blocking):", emailErr)
-		}
-
-		try {
-			// These fields must exist on report or be fetched separately
-			if (report.scholar_email) {
-				const html = templates["milestone-rejected-admin"]({
-					name: report.scholar_name || "Scholar",
-					milestoneTitle:
-						report.milestone_title || `Milestone ${report.milestone_id}`,
-					courseTitle: report.course_title || `Course ${report.course_id}`,
-					milestoneNumber: String(
-						report.milestone_number ?? report.milestone_id,
-					),
-					rejectionReason: reason || "",
-					milestoneUrl: `${process.env.FRONTEND_URL || ""}/milestones`,
-					unsubscribeUrl: `${process.env.FRONTEND_URL || ""}/unsubscribe`,
-				})
-
-				await sendEmail({
-					to: report.scholar_email,
-					subject: "Milestone Rejected",
-					html,
-					text: toPlainText(html),
 				})
 			}
 		} catch (emailErr) {
